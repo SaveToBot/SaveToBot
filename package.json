@@ -28,7 +28,9 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
+    "knex": "^2.3.0",
     "node-telegram-bot-api": "^0.59.0",
+    "sqlite3": "^5.1.2",
     "twitter-api-v2": "^1.12.8"
   },
   "devDependencies": {
