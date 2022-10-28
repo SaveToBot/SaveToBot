@@ -24,13 +24,17 @@ SaveTo bot
 - Create .env like .env.example file and adjust keys 
 
 - Run database migrates and seeds 
+
 > `npx knex migrate:latest`
+
 > `npx knex seed:run`
 
 - Run
+
 > `yarn` or `npm install` **for install the dependencies**.
 
 > `yarn start:dev` or `npm run start:dev` for dev mode
+
 > `yarn start` or `npm start` for production mode
 
 
