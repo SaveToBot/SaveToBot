@@ -1,8 +1,12 @@
+import { CronJob } from 'cron'
 import { listenToCommands } from './apps/telegram'
 import { handleNewMentions } from './apps/twiiter'
 
-async function App() {
+function App() {
   listenToCommands()
-  handleNewMentions()
+
+  // every 2 minutes
+  const job = new CronJob('* 0/2 * * * *', handleNewMentions)
+  job.start()
 }
 App()
