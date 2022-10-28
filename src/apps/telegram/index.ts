@@ -1,19 +1,33 @@
 import TelegramBot from 'node-telegram-bot-api'
-import config from '../../config'
-import { TelegramMessageParams } from './types'
+import { TweetV1 } from 'twitter-api-v2'
+import connection from '../../database/connection'
+import messages from '../../utils/messages'
+import bot from './telegramBot'
 
-const bot = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true })
-
-export default function initTelegram() {
-  bot.onText(/\/start/, (msg: TelegramBot.Message) => {
+export function listenToCommands() {
+  bot.onText(/\/start/, async (msg: TelegramBot.Message) => {
     const payload = msg.text?.substring(6)
     const chatId = msg.chat.id
     if (payload?.length) {
-      const url = Buffer.from(payload, 'base64').toString()
-      const params: TelegramMessageParams = Object.fromEntries(new URLSearchParams(url).entries())
-      bot.sendMessage(chatId, `hello there! token:${params?.token}`)
+      const token = Buffer.from(payload, 'base64').toString()
+      const user = await connection('usersConnectedApps').where({ id: token }).first()
+      if (!user) {
+        bot.sendMessage(chatId, messages.invalidToken)
+      } else {
+        await connection('usersConnectedApps')
+          .update({
+            telegram_user_id: chatId,
+          })
+          .where({ id: token })
+
+        bot.sendMessage(chatId, messages.connectedSuccessfully)
+      }
     } else {
-      bot.sendMessage(chatId, 'You should start the bot using the link that you received from twitter bot :)')
+      bot.sendMessage(chatId, messages.startViaLink)
     }
   })
+}
+
+export function forwardTweet(tweet: TweetV1, telegramUserId: string) {
+  bot.sendMessage(telegramUserId, tweet.full_text || 'noText')
 }
